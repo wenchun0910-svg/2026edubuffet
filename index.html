@@ -470,6 +470,7 @@
         let capturedShots = []; 
         let isShootingSequence = false; 
 
+        // 動態外觀設定預設值
         let currentConfig = {
             siteTitle: "智能拍貼機",
             logoUrl: "Gemini_Generated_Image_kpq5mkpq5mkpq5mk.png",
@@ -479,7 +480,7 @@
         // ==========================================
         // 初始化 Firebase
         // ==========================================
-   const firebaseConfig = {
+         const firebaseConfig = {
   apiKey: "AIzaSyC4xX1pgQECCv_0BPJ7c3evNJHDLPvZkmE",
   authDomain: "photobooth-92401.firebaseapp.com",
   projectId: "photobooth-92401",
@@ -490,10 +491,6 @@
         // 給您的拍貼機取一個專屬的 ID
         appId = 'my-custom-photo-booth';
 
-        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-            try { firebaseConfig = JSON.parse(__firebase_config); } catch(e){}
-        }
-        appId = typeof __app_id !== 'undefined' ? __app_id : 'default-photo-booth';
 
         try {
             const app = initializeApp(firebaseConfig);
@@ -911,6 +908,7 @@
             uploadAndSavePhoto(finalImageData);
         }
 
+        // ⭐ 已修復上傳時沒有 no-cors，確保資料能正確存入 Firebase
         async function uploadAndSavePhoto(imageData) {
             lastUploadedPhotoId = null;
             lastUploadedDriveId = null;
@@ -924,7 +922,6 @@
                     if (typeof GOOGLE_SCRIPT_URL !== 'undefined' && GOOGLE_SCRIPT_URL.startsWith("https://script.google.com/")) {
                         const res = await fetch(GOOGLE_SCRIPT_URL, {
                             method: 'POST',
-                            mode: 'no-cors',
                             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                             body: JSON.stringify({
                                 action: 'upload',
@@ -954,6 +951,7 @@
                     const shareUrl = window.location.origin + window.location.pathname + '?view=' + docRef.id;
                     generateQRCode(shareUrl);
                 } catch (err) {
+                    console.error("儲存至資料庫發生錯誤:", err);
                     generateQRCode(window.location.href); 
                 }
             } else {
@@ -1585,4 +1583,5 @@
     </script>
 </body>
 </html>
+
 
