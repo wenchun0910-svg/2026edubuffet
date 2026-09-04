@@ -927,6 +927,7 @@
                     if (typeof GOOGLE_SCRIPT_URL !== 'undefined' && GOOGLE_SCRIPT_URL.startsWith("https://script.google.com/")) {
                         const res = await fetch(GOOGLE_SCRIPT_URL, {
                             method: 'POST',
+                            mode: 'no-cors',
                             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                             body: JSON.stringify({
                                 action: 'upload',
@@ -1040,6 +1041,7 @@
                 if (lastUploadedDriveId && typeof GOOGLE_SCRIPT_URL !== 'undefined' && GOOGLE_SCRIPT_URL.startsWith("https://script.google.com/")) {
                     fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ action: 'delete', fileId: lastUploadedDriveId })
                     }).catch(err => {});
@@ -1272,6 +1274,7 @@
                         if (driveFileId && typeof GOOGLE_SCRIPT_URL !== 'undefined' && GOOGLE_SCRIPT_URL.startsWith("https://script.google.com/")) {
                             await fetch(GOOGLE_SCRIPT_URL, {
                                 method: 'POST',
+                                mode: 'no-cors',
                                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                                 body: JSON.stringify({ action: 'delete', fileId: driveFileId })
                             }).catch(err => {});
@@ -1374,6 +1377,7 @@
                     if (photo.driveFileId && typeof GOOGLE_SCRIPT_URL !== 'undefined' && GOOGLE_SCRIPT_URL.startsWith("https://script.google.com/")) {
                         fetch(GOOGLE_SCRIPT_URL, {
                             method: 'POST',
+                            mode: 'no-cors',
                             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                             body: JSON.stringify({ action: 'delete', fileId: photo.driveFileId })
                         }).catch(err => {});
