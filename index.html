@@ -376,16 +376,27 @@
                         </div>
                     </div>
 
-                    <!-- 系統帳號設定區 -->
+                    <!-- ⭐ 系統帳號設定區 (加入協作者名單) -->
                     <div class="bg-white rounded-3xl shadow-sm p-6 border border-gray-100 flex flex-col h-fit">
                         <h2 class="text-xl font-black text-gray-800 mb-4 border-b pb-3"><i class="fa-solid fa-users-gear text-pink-500 mr-2"></i>帳號設定</h2>
                         <div class="flex flex-col gap-3">
                             <button id="btn-open-password-modal" class="w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 py-3 rounded-xl text-sm font-bold transition">
-                                <i class="fa-solid fa-key text-gray-400"></i> 修改密碼
+                                <i class="fa-solid fa-key text-gray-400"></i> 修改我的密碼
                             </button>
                             <button id="btn-open-collab-modal" class="w-full flex items-center justify-center gap-2 bg-pink-50 hover:bg-pink-100 border border-pink-100 text-pink-600 py-3 rounded-xl text-sm font-bold transition hidden">
                                 <i class="fa-solid fa-user-plus"></i> 新增協作者
                             </button>
+                        </div>
+                        
+                        <!-- 協作者名單 (僅管理員可見) -->
+                        <div id="admin-collab-section" class="mt-5 hidden flex-col border-t border-gray-100 pt-3">
+                            <h3 class="text-sm font-bold text-gray-600 mb-2 flex justify-between items-center">
+                                協作者名單
+                                <i class="fa-solid fa-circle-info text-gray-400 cursor-help" title="前端僅提供名單管理。若要強制撤銷登入權限，請至 Firebase Authentication 刪除該帳號。"></i>
+                            </h3>
+                            <ul id="admin-collab-list" class="flex flex-col gap-2 max-h-[150px] overflow-y-auto custom-scrollbar pr-1">
+                                <li class="text-center text-gray-400 text-xs py-2">載入中...</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -393,11 +404,11 @@
         </div>
     </div>
 
-    <!-- 修改密碼與協作者視窗 -->
+    <!-- 修改密碼視窗 -->
     <div id="modal-change-password" class="fixed inset-0 bg-gray-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm p-4 transition-opacity">
         <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl relative border border-gray-100">
             <button id="btn-close-password-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-2xl font-black text-gray-800 mb-6 flex items-center"><i class="fa-solid fa-key text-pink-500 mr-2"></i>修改密碼</h2>
+            <h2 class="text-2xl font-black text-gray-800 mb-6 flex items-center"><i class="fa-solid fa-key text-pink-500 mr-2"></i>修改我的密碼</h2>
             <form id="form-change-password" class="flex flex-col gap-4">
                 <div>
                     <label class="block text-sm font-bold text-gray-600 mb-1">新密碼</label>
@@ -409,6 +420,7 @@
         </div>
     </div>
 
+    <!-- ⭐ 新增協作者視窗 (加入備註欄位) -->
     <div id="modal-add-collaborator" class="fixed inset-0 bg-gray-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm p-4 transition-opacity">
         <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl relative border border-gray-100">
             <button id="btn-close-collab-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
@@ -421,6 +433,10 @@
                 <div>
                     <label class="block text-sm font-bold text-gray-600 mb-1">初始密碼</label>
                     <input type="password" id="new-collab-password" required placeholder="設定密碼 (至少6碼)" class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-1">備註說明 (選填)</label>
+                    <input type="text" id="new-collab-note" placeholder="例如：三年級老師" class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 bg-gray-50">
                 </div>
                 <button type="submit" class="w-full bg-gray-800 text-white py-3 rounded-xl text-base font-bold hover:bg-gray-900 transition mt-2 shadow-md">建立帳號</button>
             </form>
@@ -908,7 +924,6 @@
             uploadAndSavePhoto(finalImageData);
         }
 
-        // ⭐ 已修復上傳時沒有 no-cors，確保資料能正確存入 Firebase
         async function uploadAndSavePhoto(imageData) {
             lastUploadedPhotoId = null;
             lastUploadedDriveId = null;
@@ -1167,10 +1182,13 @@
             }
 
             const btnCollabModal = document.getElementById('btn-open-collab-modal');
+            const adminCollabSection = document.getElementById('admin-collab-section');
             if (isAdmin) {
                 if (btnCollabModal) { btnCollabModal.classList.remove('hidden'); btnCollabModal.classList.add('flex'); }
+                if (adminCollabSection) { adminCollabSection.classList.remove('hidden'); adminCollabSection.classList.add('flex'); }
             } else {
                 if (btnCollabModal) { btnCollabModal.classList.add('hidden'); btnCollabModal.classList.remove('flex'); }
+                if (adminCollabSection) { adminCollabSection.classList.add('hidden'); adminCollabSection.classList.remove('flex'); }
             }
 
             if(db) {
@@ -1190,6 +1208,52 @@
                     snapshot.forEach(doc => localFrames.push({ id: doc.id, ...doc.data(), isDefault: false }));
                     renderAdminFrames(localFrames);
                 });
+
+                // ⭐ 監聽協作者名單 (僅管理員載入)
+                if (isAdmin) {
+                    const collabsRef = collection(db, 'artifacts', appId, 'public', 'data', 'collaborators');
+                    onSnapshot(collabsRef, (snapshot) => {
+                        const list = document.getElementById('admin-collab-list');
+                        if(!list) return;
+                        list.innerHTML = '';
+                        if(snapshot.empty) {
+                            list.innerHTML = '<li class="text-xs text-gray-400 text-center py-2">目前無協作者資料</li>';
+                            return;
+                        }
+                        snapshot.forEach(docSnap => {
+                            const data = docSnap.data();
+                            const li = document.createElement('li');
+                            li.className = "flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-100";
+                            li.innerHTML = `
+                                <div class="flex flex-col overflow-hidden">
+                                    <span class="text-sm font-bold text-gray-700 truncate">${data.username}</span>
+                                    <span class="text-xs text-gray-500 truncate">${data.note || '無備註'}</span>
+                                </div>
+                                <div class="flex gap-1 shrink-0">
+                                    <button class="btn-edit-collab text-blue-500 hover:bg-blue-100 p-1.5 rounded transition" data-id="${docSnap.id}" data-note="${data.note || ''}" title="修改備註"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn-del-collab text-red-500 hover:bg-red-100 p-1.5 rounded transition" data-id="${docSnap.id}" title="移除名單"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            `;
+                            
+                            li.querySelector('.btn-edit-collab').addEventListener('click', async (e) => {
+                                const id = e.target.closest('button').dataset.id;
+                                const oldNote = e.target.closest('button').dataset.note;
+                                const newNote = prompt("請輸入新的備註內容：", oldNote);
+                                if (newNote !== null) {
+                                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'collaborators', id), { note: newNote.trim() }, { merge: true });
+                                }
+                            });
+
+                            li.querySelector('.btn-del-collab').addEventListener('click', async (e) => {
+                                if(confirm("確定要從名單中移除此協作者嗎？\n(注意：前端僅移除名單顯示。為確保系統安全，完整撤銷登入權限需至 Firebase Authentication 後台刪除該帳號)")) {
+                                    const id = e.target.closest('button').dataset.id;
+                                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'collaborators', id));
+                                }
+                            });
+                            list.appendChild(li);
+                        });
+                    });
+                }
             }
         }
 
@@ -1533,8 +1597,9 @@
 
         document.getElementById('form-add-collaborator')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('new-collab-username').value;
+            const username = document.getElementById('new-collab-username').value.trim();
             const pwd = document.getElementById('new-collab-password').value;
+            const note = document.getElementById('new-collab-note').value.trim();
             const email = getFakeEmail(username);
             const msgEl = document.getElementById('add-collab-msg');
             const btn = e.target.querySelector('button');
@@ -1547,6 +1612,17 @@
                 const secondaryAuth = getAuth(secondaryApp);
                 await createUserWithEmailAndPassword(secondaryAuth, email, pwd);
                 await signOut(secondaryAuth); 
+
+                // 儲存協作者名單至資料庫
+                if(db) {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'collaborators'), {
+                        username: username,
+                        email: email,
+                        note: note,
+                        timestamp: Date.now()
+                    });
+                }
+
                 msgEl.innerText = "✅ 建立成功！";
                 msgEl.className = "text-sm text-center mt-4 text-green-600 font-bold bg-green-50 py-2 rounded-lg";
                 e.target.reset();
@@ -1583,5 +1659,6 @@
     </script>
 </body>
 </html>
+
 
 
